@@ -21,7 +21,7 @@
 
 'use strict';
 
-const applicationServerPublicKey = '<Your Public Key>';
+const applicationServerPublicKey = 'BGYxBJ-YmUyI8u8DY9Z6aEDa7_FuVvyQlmqFwV5Y9bi6xXwzhG5RDBpG9ep4T-nZCwZzWxjgegM-95ZiA8xoqVE';
 
 const pushButton = document.querySelector('.js-push-btn');
 
@@ -43,6 +43,81 @@ function urlB64ToUint8Array(base64String) {
   return outputArray;
 }
 
+function updateBtn() {
+  if (isSubscribed) {
+    pushButton.textContent = 'Disable Push Messaging';
+  } else {
+    pushButton.textContent = 'Enable Push Messaging';
+  }
+
+  pushButton.disabled = false;
+}
+
+function updateSubscriptionOnServer(subscription) {
+  // TODO: Send subscription to application server
+
+  const subscriptionJson = document.querySelector('.js-subscription-json');
+  const subscriptionDetails = document.querySelector('.js-subscription-details');
+
+  if (subscription) {
+    subscriptionJson.textContent = JSON.stringify(subscription);
+    subscriptionDetails.classList.remove('is-invisible');
+  } else {
+    subscriptionDetails.classList.add('is-invisible');
+  }
+}
+
+function subscribeUser() {
+  const applicationServerPublicKey = urlB64ToUint8Array(applicationServerPublicKey);
+  swRegistration.pushManager.subscribe({
+    userVisibleOnly: true,
+    applicationServerKey: applicationServerKey
+  })
+  .then(function(subscription) {
+    console.log('User is subscribed.');
+
+    updateSubscriptionOnServer(subscription);
+
+    isSubscribed = true;
+    
+    updateBtn();
+  })
+  .catch(function(err) {
+    console.log('Failed to subscribe the user: ', err);
+    updateBtn();
+  });
+}
+
+// Initialize the 'Enable Push Messaging' button
+// so that it becomes clickable
+function initialiseUI() {
+  // Subscribe or Unsubscribe the user from push notification
+  // by adding 'click' event listener to the button
+  pushButton.addEventListener('click', function() {
+    pushButton.disabled = true;
+    if (isSubscribed) {
+      // TODO: Unsubscribed user
+    } else {
+      subscribeUser();
+    }
+  });
+  
+  // Set the initial subscription value
+  swRegistration.pushManager.getSubscription()
+  .then(function(subscription) {
+    isSubscribed = !(subscription === null);
+
+    if (isSubscribed) {
+      console.log('User IS subscribed');
+    } else {
+      console.log('User is NOT subscribed');
+    }
+
+    updateBtn();
+  });
+}
+
+// Registering Service Worker where the file name is 'sw.js'
 if ('serviceWorker' in navigator && 'PushManager' in window) {
   console.log("Service Worker and Push is supported");
 
@@ -50,6 +125,8 @@ if ('serviceWorker' in navigator && 'PushManager' in window) {
   .then(function(swReg) {
     console.log("Service Wroker is registered", swReg);
     swRegistration = swReg;
+    // Initialize the button UI by subscribing to notificaitons
+    initialiseUI();
   })
   .catch(function(error) {
     console.log("Service Worker Error", error);
