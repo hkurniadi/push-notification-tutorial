@@ -7,5 +7,5 @@ const app = express();
 app.use(express.static('app'));
 
 app.listen(PORT, () => {
-  console.log('Push-Notificaiton App listening on port', PORT);
+  console.log('Push-Notification Tutorial App listening on port', PORT);
 });

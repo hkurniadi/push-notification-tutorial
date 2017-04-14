@@ -44,6 +44,15 @@ function urlB64ToUint8Array(base64String) {
 }
 
 function updateBtn() {
+  // Handling user rejecting permission for notification
+  if (Notification.permission === 'denied') {
+    pushButton.textContent = 'Push Messaging Blocked.';
+    pushButton.disabled = true;
+    updateSubscriptionOnServer(null);
+    return;
+  }
+  
+  // Handling user granting permission for notification
   if (isSubscribed) {
     pushButton.textContent = 'Disable Push Messaging';
   } else {
@@ -68,7 +77,7 @@ function updateSubscriptionOnServer(subscription) {
 }
 
 function subscribeUser() {
-  const applicationServerPublicKey = urlB64ToUint8Array(applicationServerPublicKey);
+  const applicationServerKey = urlB64ToUint8Array(applicationServerPublicKey);
   swRegistration.pushManager.subscribe({
     userVisibleOnly: true,
     applicationServerKey: applicationServerKey
@@ -92,12 +101,20 @@ function subscribeUser() {
 // so that it becomes clickable
 function initialiseUI() {
   // Subscribe or Unsubscribe the user from push notification
-  // by adding 'click' event listener to the button
+  // when the user clicks the button
   pushButton.addEventListener('click', function() {
+    /* 
+    When the button gets clicked, it becomes disabled or
+    unavailable for click for a moment because
+    users may click the button multiple times
+    while the process to 'enabling' or 'subscribing' to notification takes a while  
+    */    
     pushButton.disabled = true;
     if (isSubscribed) {
       // TODO: Unsubscribed user
+      // If user already subscribes, unsubscribe it
     } else {
+      // If the user do not already subscribe, subscribe it
       subscribeUser();
     }
   });

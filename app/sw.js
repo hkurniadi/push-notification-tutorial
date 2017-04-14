@@ -20,3 +20,26 @@
 /* eslint-env browser, serviceworker, es6 */
 
 'use strict';
+
+/* 
+This event listener will listen to 'push' event
+which is indicating incoming push notification from the server to the client
+*/
+self.addEventListener('push', function(event) { // 'self' is referencing the service worker itself
+  console.log('[Service Worker] Push Received.');
+  console.log(`[Service Worker] Push had this data: "${event.data.text()}"`);
+
+  const title = 'Push codelab';
+  const options = {
+    body: 'Yay it works',
+    icon: 'images/icon.png',
+    badge: 'images/badge.png'
+  };
+
+  event.waitUntil(self.registration.showNotification(title, options));
+  // OR re-written like this
+  /*
+  const notificationPromise = self.registration.showNotification(title, options);
+  event.waitUntil(notificationPromise);
+  */
+});
