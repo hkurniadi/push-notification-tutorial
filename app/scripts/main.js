@@ -97,6 +97,27 @@ function subscribeUser() {
   });
 }
 
+function unsubscribeUser() {
+  swRegistration.pushManager.getSubscription()
+  .then(function(subscription) {
+    if (subscription) {
+      // Tell application server to delete subscription
+      return subscription.unsubscribe();
+    }
+  })
+  .catch(function(error) {
+    console.log('Error unsubscribing', error);
+  })
+  .then(function() {
+    updateSubscriptionOnServer(null);
+
+    console.log('User is unsubscribed.');
+    isSubscribed = false;
+
+    updateBtn();
+  });
+}
+
 // Initialize the 'Enable Push Messaging' button
 // so that it becomes clickable
 function initialiseUI() {
@@ -113,6 +134,7 @@ function initialiseUI() {
     if (isSubscribed) {
       // TODO: Unsubscribed user
       // If user already subscribes, unsubscribe it
+      unsubscribeUser();
     } else {
       // If the user do not already subscribe, subscribe it
       subscribeUser();

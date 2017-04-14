@@ -31,7 +31,8 @@ self.addEventListener('push', function(event) { // 'self' is referencing the ser
 
   const title = 'Push codelab';
   const options = {
-    body: 'Yay it works',
+    // body: 'Yay it works',
+    body: event.data.text(),
     icon: 'images/icon.png',
     badge: 'images/badge.png'
   };
