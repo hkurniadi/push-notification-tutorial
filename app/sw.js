@@ -43,3 +43,14 @@ self.addEventListener('push', function(event) { // 'self' is referencing the ser
   event.waitUntil(notificationPromise);
   */
 });
+
+// This event handler is to handle 'click' event on the notification
+self.addEventListener('notificationclick', function(event) {
+  console.log('[Service Worker] Notification click Received.');
+
+  event.notification.close();
+
+  event.waitUntil(
+    clients.openWindow('https://developers.google.com/web/')  
+  );
+});
